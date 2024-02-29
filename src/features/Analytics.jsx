@@ -4,9 +4,11 @@ import { fetchOrderData } from "../store/apiSlice";
 import BarChart from "../components/BarChart/BarChart";
 import Header from "./Header";
 import "./analytics.scss";
-import { dataFilterFunction } from "../utils/dataFilter";
+import { dataFilterFunction, modifyData } from "../utils/dataFilter";
 import {
+  updateAgeData,
   updateCountryData,
+  updateGenderData,
   updateOrderData,
   updateProductData,
 } from "../store/slices/dataSlice";
@@ -25,13 +27,24 @@ function Analytics() {
     country,
     order,
     product,
+    gender,
+    age
   } = useSelector((state) => state.analyticsData);
 
+  const dataProps={
+    country: "country",
+    product: "productId",
+    order: "orderDate",
+    gender: "gender",
+    age: "age"
+  }
+
   const separateData = (data) => {
-    const countryGraphData = dataFilterFunction(data, "country");
-    const productGraphData = dataFilterFunction(data, "productId");
-    const orderGraphData = dataFilterFunction(data, "orderDate");
-    const genderGraphData = dataFilterFunction(data, "gender");
+    const countryGraphData = dataFilterFunction(data, dataProps.country);
+    const productGraphData = dataFilterFunction(data, dataProps.product);
+    const orderGraphData = dataFilterFunction(data, dataProps.order);
+    const genderGraphData = dataFilterFunction(data, dataProps.gender);
+    const ageGraphData = dataFilterFunction(data, dataProps.age);
     console.log("gender data", genderGraphData);
 
     dispatch(
@@ -46,12 +59,25 @@ function Analytics() {
         dataset: Object.values(productGraphData).map((ele) => ele.length),
       })
     );
+
     dispatch(
       updateOrderData({
         labels: Object.keys(orderGraphData),
         dataset: Object.values(orderGraphData).map((data) =>
           data.reduce((sum, ele) => sum + ele.price, 0)
         ),
+      })
+    );
+    dispatch(
+      updateGenderData({
+        labels: Object.keys(genderGraphData),
+        dataset: Object.values(genderGraphData).map((ele) => ele.length),
+      })
+    );
+    dispatch(
+      updateAgeData({
+        labels: Object.keys(ageGraphData),
+        dataset: Object.values(ageGraphData).map((ele) => ele.length),
       })
     );
   };
@@ -63,7 +89,8 @@ function Analytics() {
   useEffect(() => {
     console.log("data check: ", allData, sampleData);
     if (allData.length > 0) {
-      separateData(allData);
+      separateData(modifyData(allData));
+      console.log("modify Data: ", modifyData(allData))
     }
   }, [isLoading, allData]);
 
@@ -88,14 +115,14 @@ function Analytics() {
             labels={product?.labels}
           />
         </div>
-        <WorldMap />
+        <WorldMap title={"World"} labels={country?.labels} data={country?.dataset} />
         <div className="grid-two">
           <DonutChart
             title={"Gender"}
-            data={sampleData}
-            labels={sampleLabels}
+            data={gender?.dataset}
+            labels={gender?.labels}
           />
-          <BarChart title={"Testing"} data={sampleData} labels={sampleLabels} />
+          <BarChart title={"Age"} data={age?.dataset} labels={age?.labels} />
         </div>
       </div>
     </>

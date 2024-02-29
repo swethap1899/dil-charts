@@ -1,0 +1,13 @@
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    background: none;
+    border: none;
+    img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}

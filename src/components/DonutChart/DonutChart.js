@@ -6,6 +6,8 @@ import "chartjs-plugin-datalabels";
 import "./donutchart.scss";
 
 function DonutChart({ title, data, labels }) {
+  const themeColors = ["#631d3f77", "#e30b7377"];
+
   const options = {
     indexAxis: "y",
     maintainAspectRation: false,
@@ -25,8 +27,9 @@ function DonutChart({ title, data, labels }) {
         label: title,
         data: [...(data || [])],
         borderWidth: 1,
-        backgroundColor: "#DE046D77",
-        borderColor: "#DE046D77",
+        backgroundColor: themeColors,
+        hoverBackgroundColor: themeColors,
+        borderColor: "#FFF",
       },
     ],
   };

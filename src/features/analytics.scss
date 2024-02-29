@@ -10,13 +10,15 @@
 
   .grid-two {
     display: grid;
-    grid-template-columns: 49% 49%;
-    gap: 10px;
+    grid-template-columns: 49.5% 49.5%;
+    gap: 1%;
+    justify-content: space-between;
   }
 
   .grid-three {
     display: grid;
-    grid-template-columns: 32.3% 32.3% 32.3%;
-    gap: 10px;
+    grid-template-columns: 33% 33% 33%;
+    gap: 1%;
+    justify-content: space-between;
   }
 }

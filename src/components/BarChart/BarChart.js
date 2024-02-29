@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,9 +11,21 @@ import {
 import { Bar, getElementAtEvent } from "react-chartjs-2";
 import "chartjs-plugin-datalabels";
 import "./barchart.scss";
+import PopUpWindow from "../PopUpWindow/PopUpWindow";
+import ChartHeader from "../ChartHeader/ChartHeader";
 
 function BarChart({ title, data, labels }) {
+  const numBars = 7;
   const chartRef = useRef();
+
+  const [popup, setPopup] = useState(false);
+  const togglePopUp = () => {
+    setPopup(!popup);
+  };
+
+  const dataMod = popup ? data : data?.slice(0, numBars);
+  const labelsMod = popup ? labels : labels?.slice(0, numBars);
+
   const options = {
     indexAxis: "y",
     maintainAspectRation: false,
@@ -49,25 +61,68 @@ function BarChart({ title, data, labels }) {
   };
 
   const dataSet = {
-    labels: [...(labels || [])],
+    labels: [...(labelsMod || [])],
     datasets: [
       {
-        data: [...(data || [])],
-        borderWidth: 1,
+        label: "Orders",
+        data: [...(dataMod || [])],
+        borderWidth: 0.9,
         categoryPercentage: 0.9,
-        backgroundColor: "#DE046D77",
-        borderColor: "#DE046D77",
+        minBarLength: 3,
+        backgroundColor: "#DE046D55",
+        borderColor: "#DE046D55",
       },
     ],
   };
 
+  const dataPlugins = [
+    {
+      afterDraw: (chart) => {
+        const { ctx } = chart;
+
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          if (!meta.hidden) {
+            meta.data.forEach((element, index) => {
+              if (!element.hidden) {
+                const { y } = element.tooltipPosition();
+                ctx.fillStyle = "#474747"; // Font color of the labels
+                // ctx.font = `16px ${themeColors.fontFamilyLabels}`; // Font style and size
+                ctx.textAlign = "start";
+                ctx.textBaseline = "middle";
+                const labelName = `${chart.data.labels[index]}`;
+
+                ctx.fillText(labelName, 10, y); // Adjust the vertical position of the label (-20)
+              }
+            });
+          }
+        });
+      },
+    },
+  ];
+
   ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
-  return (
+
+  const ChartData = (
     <div className="barchart-body background-box">
-      {title}
-      <Bar ref={chartRef} data={dataSet} options={options} height="200px" />
+      <ChartHeader title={title} popup={popup} togglePopUp={togglePopUp} />
+      <div
+        className="chart-content"
+        style={{ height: popup ? "100vh" : "fit-content", width: "80%" }}
+      >
+        <Bar
+          plugins={[...dataPlugins]}
+          ref={chartRef}
+          data={dataSet}
+          options={options}
+          // height={dataSet?.datasets[0].length > 5 ? "700" : "200"}
+        />
+      </div>
     </div>
   );
+
+  if (popup) return <PopUpWindow>{ChartData}</PopUpWindow>;
+  else return ChartData;
 }
 
 export default BarChart;

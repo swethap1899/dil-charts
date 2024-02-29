@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,30 +14,40 @@ import {
 import { Line } from "react-chartjs-2";
 import "chartjs-plugin-datalabels";
 import "./linechart.scss";
+import ChartHeader from "../ChartHeader/ChartHeader";
+import PopUpWindow from "../PopUpWindow/PopUpWindow";
 
 function LineChart({ title, data, labels }) {
+  const [popup, setPopup] = useState(false);
+  const togglePopUp = () => {
+    setPopup(!popup);
+  };
   const options = {
     type: "line",
+    responsive: true,
     scales: {
       x: {
         grid: {
           display: false,
         },
-        ticks: {
-          display: false,
-        },
-        label: {
-          display: true,
-        },
+        beginAtZero: false,
       },
       y: {
         stacked: false,
+        border: { dash: [4, 5] },
+        grid: {
+          color: "#D0D0D0", // for the grid lines
+          offset: false,
+          drawTicks: false, // true is default
+        },
+        beginAtZero: true,
       },
     },
-    responsive: true,
     plugins: {
       legend: {
         display: true,
+        position: "top",
+        align: "end",
       },
     },
   };
@@ -51,6 +61,7 @@ function LineChart({ title, data, labels }) {
         borderWidth: 1,
         backgroundColor: "#DE046D77",
         borderColor: "#DE046D77",
+        borderCapStyle: "round",
         lineTension: 0.3,
       },
     ],
@@ -66,12 +77,15 @@ function LineChart({ title, data, labels }) {
     Legend,
     Filler
   );
-  return (
+
+  const ChartData = (
     <div className="linechart-body background-box">
-      {title}
+      <ChartHeader title={title} popup={popup} togglePopUp={togglePopUp} />
       <Line data={dataSet} options={options} height="200px" />
     </div>
   );
+  if (popup) return <PopUpWindow>{ChartData}</PopUpWindow>;
+  else return ChartData;
 }
 
 export default LineChart;

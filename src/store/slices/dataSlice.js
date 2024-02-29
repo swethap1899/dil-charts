@@ -9,6 +9,8 @@ const initialState = {
   country: {},
   product: {},
   order: {},
+  gender: {},
+  age: {},
   isLoading: false,
 };
 
@@ -30,6 +32,12 @@ const dataSlice = createSlice({
     },
     updateOrderData: (state, actions) => {
       return { ...state, order: { ...actions.payload } };
+    },
+    updateGenderData: (state, actions) => {
+      return { ...state, gender: actions.payload };
+    },
+    updateAgeData: (state, actions) => {
+      return { ...state, age: actions.payload };
     },
     updateIsLoading: (state) => {
       return { ...state, isLoading: !state.isLoading };
@@ -55,6 +63,8 @@ export const {
   updateOrderData,
   updateProductData,
   updateRevenueData,
+  updateGenderData,
+  updateAgeData,
   updateIsLoading,
 } = dataSlice.actions;
 
