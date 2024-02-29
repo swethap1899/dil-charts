@@ -5,12 +5,14 @@ const initialState = {
   sampleData: [243, 21, 75, 856, 23, 45],
   sampleLabels: ["hello", "hello", "hello", "hello", "hello", "hello"],
   allData: [],
+  filteredData: [],
   revenue: [],
   country: {},
   product: {},
   order: {},
   gender: {},
   age: {},
+  selectedFilters: {},
   isLoading: false,
 };
 
@@ -18,8 +20,8 @@ const dataSlice = createSlice({
   name: "analyticsData",
   initialState,
   reducers: {
-    updateSampleData: (state) => {
-      return { ...state, sampleData: [59, 80, 81, 56, 55, 40] };
+    updateFilteredData: (state, actions) => {
+      return { ...state, filteredData: [...actions.payload] };
     },
     updateRevenueData: (state, actions) => {
       return { ...state, revenue: actions.payload };
@@ -42,6 +44,12 @@ const dataSlice = createSlice({
     updateIsLoading: (state) => {
       return { ...state, isLoading: !state.isLoading };
     },
+    updateSelectedFilters: (state, actions) => {
+      return {
+        ...state,
+        selectedFilters: actions.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -58,7 +66,7 @@ const dataSlice = createSlice({
 });
 
 export const {
-  updateSampleData,
+  updateFilteredData,
   updateCountryData,
   updateOrderData,
   updateProductData,
@@ -66,6 +74,7 @@ export const {
   updateGenderData,
   updateAgeData,
   updateIsLoading,
+  updateSelectedFilters,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

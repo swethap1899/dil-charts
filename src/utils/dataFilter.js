@@ -25,8 +25,6 @@ export const modifyData = (data) => {
       day: "2-digit",
     });
 
-    console.log("check: ", d);
-
     return {
       ...ele,
       age,

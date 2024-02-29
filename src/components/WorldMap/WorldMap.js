@@ -26,7 +26,6 @@ function WorldMap({ title, data, labels }) {
             return geographies.map((geo) => {
               let indexCountry = null;
               labels?.map((ele, i) => {
-                // console.log(ele, geo.properties);
                 if (ele === geo.properties.name) {
                   indexCountry = i;
                 }

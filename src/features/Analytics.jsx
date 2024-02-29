@@ -8,6 +8,7 @@ import { dataFilterFunction, modifyData } from "../utils/dataFilter";
 import {
   updateAgeData,
   updateCountryData,
+  updateFilteredData,
   updateGenderData,
   updateOrderData,
   updateProductData,
@@ -23,21 +24,22 @@ function Analytics() {
     isLoading,
     allData,
     sampleData,
-    sampleLabels,
+    selectedFilters,
+    filteredData,
     country,
     order,
     product,
     gender,
-    age
+    age,
   } = useSelector((state) => state.analyticsData);
 
-  const dataProps={
+  const dataProps = {
     country: "country",
     product: "productId",
     order: "orderDate",
     gender: "gender",
-    age: "age"
-  }
+    age: "age",
+  };
 
   const separateData = (data) => {
     const countryGraphData = dataFilterFunction(data, dataProps.country);
@@ -45,20 +47,21 @@ function Analytics() {
     const orderGraphData = dataFilterFunction(data, dataProps.order);
     const genderGraphData = dataFilterFunction(data, dataProps.gender);
     const ageGraphData = dataFilterFunction(data, dataProps.age);
-    console.log("gender data", genderGraphData);
 
-    dispatch(
-      updateCountryData({
-        labels: Object.keys(countryGraphData),
-        dataset: Object.values(countryGraphData).map((ele) => ele.length),
-      })
-    );
-    dispatch(
-      updateProductData({
-        labels: Object.keys(productGraphData),
-        dataset: Object.values(productGraphData).map((ele) => ele.length),
-      })
-    );
+    if (!selectedFilters.Country)
+      dispatch(
+        updateCountryData({
+          labels: Object.keys(countryGraphData),
+          dataset: Object.values(countryGraphData).map((ele) => ele.length),
+        })
+      );
+    if (!selectedFilters.Products)
+      dispatch(
+        updateProductData({
+          labels: Object.keys(productGraphData),
+          dataset: Object.values(productGraphData).map((ele) => ele.length),
+        })
+      );
 
     dispatch(
       updateOrderData({
@@ -68,18 +71,52 @@ function Analytics() {
         ),
       })
     );
-    dispatch(
-      updateGenderData({
-        labels: Object.keys(genderGraphData),
-        dataset: Object.values(genderGraphData).map((ele) => ele.length),
-      })
-    );
-    dispatch(
-      updateAgeData({
-        labels: Object.keys(ageGraphData),
-        dataset: Object.values(ageGraphData).map((ele) => ele.length),
-      })
-    );
+    if (!selectedFilters.Gender)
+      dispatch(
+        updateGenderData({
+          labels: Object.keys(genderGraphData),
+          dataset: Object.values(genderGraphData).map((ele) => ele.length),
+        })
+      );
+    if (!selectedFilters.Age)
+      dispatch(
+        updateAgeData({
+          labels: Object.keys(ageGraphData),
+          dataset: Object.values(ageGraphData).map((ele) => ele.length),
+        })
+      );
+  };
+
+  const filterData = (data) => {
+    let tempData = data;
+
+    if (selectedFilters.Products) {
+      tempData = tempData.filter((ele) =>
+        selectedFilters.Products.includes(ele[dataProps.product])
+      );
+    }
+    if (selectedFilters.Age) {
+      tempData = tempData.filter((ele) =>
+        selectedFilters.Age.includes(String(ele[dataProps.age]))
+      );
+    }
+    if (selectedFilters.Country) {
+      tempData = tempData.filter((ele) =>
+        selectedFilters.Country.includes(ele[dataProps.country])
+      );
+    }
+    if (selectedFilters.World) {
+      tempData = tempData.filter((ele) =>
+        selectedFilters.World.includes(ele[dataProps.country])
+      );
+    }
+    if (selectedFilters.Gender) {
+      tempData = tempData.filter((ele) =>
+        selectedFilters.Gender.includes(String(ele[dataProps.gender]))
+      );
+    }
+
+    return tempData;
   };
 
   useEffect(() => {
@@ -88,11 +125,17 @@ function Analytics() {
 
   useEffect(() => {
     console.log("data check: ", allData, sampleData);
-    if (allData.length > 0) {
+
+    if (filteredData.length > 0) {
+      separateData(filteredData);
+    } else if (allData.length > 0) {
       separateData(modifyData(allData));
-      console.log("modify Data: ", modifyData(allData))
     }
-  }, [isLoading, allData]);
+  }, [isLoading, allData, filteredData]);
+
+  useEffect(() => {
+    dispatch(updateFilteredData(filterData(modifyData(allData))));
+  }, [selectedFilters]);
 
   return (
     <>
@@ -108,21 +151,33 @@ function Analytics() {
             title={"Country"}
             data={country?.dataset}
             labels={country?.labels}
+            filterValues={selectedFilters}
           />
           <BarChart
             title={"Products"}
             data={product?.dataset}
             labels={product?.labels}
+            filterValues={selectedFilters}
           />
         </div>
-        <WorldMap title={"World"} labels={country?.labels} data={country?.dataset} />
+        <WorldMap
+          title={"World"}
+          labels={country?.labels}
+          data={country?.dataset}
+        />
         <div className="grid-two">
           <DonutChart
             title={"Gender"}
             data={gender?.dataset}
             labels={gender?.labels}
+            filterValues={selectedFilters}
           />
-          <BarChart title={"Age"} data={age?.dataset} labels={age?.labels} />
+          <BarChart
+            title={"Age"}
+            data={age?.dataset}
+            labels={age?.labels}
+            filterValues={selectedFilters}
+          />
         </div>
       </div>
     </>
