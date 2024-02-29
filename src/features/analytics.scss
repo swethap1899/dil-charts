@@ -1,0 +1,22 @@
+@import "../assets/stylesheets/var";
+
+.analytics-container {
+  padding: 3% 0;
+  display: grid;
+  grid-template-columns: 70%;
+  justify-content: center;
+  background-color: $background;
+  gap: 10px;
+
+  .grid-two {
+    display: grid;
+    grid-template-columns: 49% 49%;
+    gap: 10px;
+  }
+
+  .grid-three {
+    display: grid;
+    grid-template-columns: 32.3% 32.3% 32.3%;
+    gap: 10px;
+  }
+}

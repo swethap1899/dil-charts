@@ -1,0 +1,19 @@
+@import "../assets/stylesheets/var";
+
+.header {
+  min-height: 4vh;
+  width: 100%;
+  padding: 0.5rem 0;
+  background-color: $white;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  .header-content {
+    width: 80%;
+    img {
+      height: 85px;
+      width: 85px;
+    }
+  }
+}
